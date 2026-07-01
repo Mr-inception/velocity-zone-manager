@@ -1,21 +1,15 @@
+from pyproj import Geod
 from shapely.geometry import shape
+
+SQ_METERS_PER_ACRE = 4046.86
+GEOD = Geod(ellps="WGS84")
 
 
 def calculate_acreage(geojson_geometry):
-    """
-    Calculates acreage from a GeoJSON Polygon geometry.
-    Uses an approximate conversion from square degrees to acres,
-    suitable for small-scale property zones (not large-scale GIS).
-    """
+    """Calculates acreage from a GeoJSON Polygon using WGS84 geodesic area."""
     polygon = shape(geojson_geometry)
-    area_sq_degrees = polygon.area
-
-    # Rough conversion: 1 degree latitude/longitude near equator ~ 111km
-    # This is an approximation appropriate for property-scale zones.
-    area_sq_meters = area_sq_degrees * (111000 ** 2)
-    acres = area_sq_meters / 4046.86
-
-    return acres
+    area_sq_meters, _ = GEOD.geometry_area_perimeter(polygon)
+    return abs(area_sq_meters) / SQ_METERS_PER_ACRE
 
 
 def is_understaffed(acreage, mower_count):

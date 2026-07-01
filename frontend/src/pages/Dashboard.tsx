@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { listProperties, createProperty, deleteProperty } from "../api/properties";
 import type { PropertyType } from "../api/properties";
-import MapView from "../components/MapView.tsx";
-import ZoneSidebar from "../components/ZoneSidebar.tsx";
+import MapView from "../components/MapView";
+import ZoneSidebar from "../components/ZoneSidebar";
 
 export default function Dashboard() {
   const [properties, setProperties] = useState<PropertyType[]>([]);
@@ -13,7 +13,10 @@ export default function Dashboard() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newProp, setNewProp] = useState({ name: "", type: "Golf Course", total_acreage: 0, notes: "" });
   const [error, setError] = useState("");
+  const [zonesVersion, setZonesVersion] = useState(0);
   const navigate = useNavigate();
+
+  const bumpZones = () => setZonesVersion((v) => v + 1);
 
   const loadProperties = async () => {
     try {
@@ -133,9 +136,17 @@ export default function Dashboard() {
         {selectedProperty ? (
           <div className="flex flex-1 overflow-hidden">
             <div className="flex-1 relative">
-              <MapView propertyId={selectedProperty.id} />
+              <MapView
+                propertyId={selectedProperty.id}
+                zonesVersion={zonesVersion}
+                onZonesChange={bumpZones}
+              />
             </div>
-            <ZoneSidebar propertyId={selectedProperty.id} />
+            <ZoneSidebar
+              propertyId={selectedProperty.id}
+              zonesVersion={zonesVersion}
+              onZonesChange={bumpZones}
+            />
           </div>
         ) : (
           <div className="flex-1 flex items-center justify-center text-gray-400">

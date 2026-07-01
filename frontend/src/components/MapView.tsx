@@ -33,9 +33,13 @@ function makeStyle(zoneType: string, understaffed: boolean) {
   });
 }
 
-interface Props { propertyId: number; }
+interface Props {
+  propertyId: number;
+  zonesVersion?: number;
+  onZonesChange?: () => void;
+}
 
-export default function MapView({ propertyId }: Props) {
+export default function MapView({ propertyId, zonesVersion, onZonesChange }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<Map | null>(null);
   const vectorSource = useRef(new VectorSource());
@@ -103,6 +107,7 @@ export default function MapView({ propertyId }: Props) {
         try {
           await updateZone(propertyId, id, { geometry: geojson.geometry });
           await loadZones();
+          onZonesChange?.();
         } catch (err) {
           console.error("Failed to save zone edit", err);
         }
@@ -115,6 +120,10 @@ export default function MapView({ propertyId }: Props) {
 
     return () => map.setTarget(undefined);
   }, [propertyId]);
+
+  useEffect(() => {
+    if (mapInstance.current) loadZones();
+  }, [zonesVersion]);
 
   const startDrawing = () => {
     if (!mapInstance.current) return;
@@ -155,7 +164,8 @@ export default function MapView({ propertyId }: Props) {
       setShowForm(false);
       setPendingGeometry(null);
       setFormData({ name: "", zone_type: "Fairway", mower_count: 1, status: "Active" });
-      loadZones();
+      await loadZones();
+      onZonesChange?.();
     } catch (err: any) {
       setFormError(err.response?.data?.error || "Failed to save zone.");
     }
@@ -168,7 +178,8 @@ export default function MapView({ propertyId }: Props) {
     try {
       const geojson = JSON.parse(text);
       await importZones(propertyId, geojson);
-      loadZones();
+      await loadZones();
+      onZonesChange?.();
     } catch (err: any) {
       alert(err.response?.data?.error || "Import failed.");
     }

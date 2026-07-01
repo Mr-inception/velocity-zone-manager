@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import { listZones, deleteZone, getZonesSummary } from "../api/zones";
 import type { ZoneType, ZonesSummary } from "../api/zones";
 
-interface Props { propertyId: number; }
+interface Props {
+  propertyId: number;
+  zonesVersion?: number;
+  onZonesChange?: () => void;
+}
 
-export default function ZoneSidebar({ propertyId }: Props) {
+export default function ZoneSidebar({ propertyId, zonesVersion, onZonesChange }: Props) {
   const [zones, setZones] = useState<ZoneType[]>([]);
   const [summary, setSummary] = useState<ZonesSummary | null>(null);
 
@@ -17,12 +21,13 @@ export default function ZoneSidebar({ propertyId }: Props) {
     setSummary(s);
   };
 
-  useEffect(() => { load(); }, [propertyId]);
+  useEffect(() => { load(); }, [propertyId, zonesVersion]);
 
   const handleDelete = async (zoneId: number) => {
     if (!confirm("Delete this zone?")) return;
     await deleteZone(propertyId, zoneId);
-    load();
+    await load();
+    onZonesChange?.();
   };
 
   return (
