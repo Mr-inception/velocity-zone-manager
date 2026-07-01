@@ -119,7 +119,7 @@ velocity-zone-manager/
 
 ### Q1 — Which AI tools did you use and what specifically for?
 
-**Claude (Anthropic)** was used throughout this project:
+Claude (Anthropic) was used throughout this project:
 
 - Generated the initial Docker Compose configuration with health checks and service dependencies
 - Wrote the Flask application factory pattern with SQLAlchemy and JWT setup
