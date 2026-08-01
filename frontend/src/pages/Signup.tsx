@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { signup } from "../api/auth";
+import { API_URL } from "../api/client";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -19,7 +20,7 @@ export default function Signup() {
       const message =
         err.response?.data?.error ||
         (err.request && !err.response
-          ? "Cannot reach the server. Check that the API is running and VITE_API_URL is set."
+          ? `Cannot reach API at ${API_URL}. Set VITE_API_URL to your backend URL on Render and redeploy the frontend.`
           : "Signup failed.");
       setError(message);
     }
