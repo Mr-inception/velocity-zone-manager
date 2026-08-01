@@ -11,4 +11,5 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+# Render injects $PORT (default 10000). Shell form so the env var expands.
+CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --timeout 120 app:app

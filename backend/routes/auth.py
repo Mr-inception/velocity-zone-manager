@@ -18,10 +18,14 @@ def signup():
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "An account with this email already exists."}), 400
 
-    user = User(email=email)
-    user.set_password(password)
-    db.session.add(user)
-    db.session.commit()
+    try:
+        user = User(email=email)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "Could not create account. Please try again."}), 500
 
     token = create_access_token(identity=str(user.id))
     return jsonify({"token": token, "user": user.to_dict()}), 201

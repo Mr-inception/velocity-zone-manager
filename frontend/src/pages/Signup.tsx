@@ -16,7 +16,12 @@ export default function Signup() {
       localStorage.setItem("token", res.token);
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.error || "Signup failed.");
+      const message =
+        err.response?.data?.error ||
+        (err.request && !err.response
+          ? "Cannot reach the server. Check that the API is running and VITE_API_URL is set."
+          : "Signup failed.");
+      setError(message);
     }
   };
 
